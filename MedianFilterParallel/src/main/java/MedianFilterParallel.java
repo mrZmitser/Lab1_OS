@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,18 +90,35 @@ public class MedianFilterParallel {
 
     private static int getMedian(BufferedImage srcImg, int x, int y, int radius) {
         int squareSide = 2 * radius + 1;
-        int[] square = new int[squareSide * squareSide];
+        int[] reds = new int[squareSide * squareSide];
+        int[] greens = new int[squareSide * squareSide];
+        int[] blues = new int[squareSide * squareSide];
+
         int k = 0;
         for (int i = -radius; i <= radius; ++i) {
             for (int j = -radius; j <= radius; ++j) {
                 try {
-                    square[k++] = srcImg.getRGB(x + i, y + j);
+                    var rgb = new Color(srcImg.getRGB(x + i, y + j));
+                    reds[k] = rgb.getRed();
+                    greens[k] = rgb.getGreen();
+                    blues[k] = rgb.getBlue();
+                    k++;
                 } catch (IndexOutOfBoundsException e) {
                     return srcImg.getRGB(x, y);
                 }
             }
         }
-        Arrays.sort(square);
-        return square[square.length / 2];
+        Arrays.sort(reds);
+        Arrays.sort(greens);
+        Arrays.sort(blues);
+        return getColorRGB(reds[reds.length / 2], greens[greens.length / 2], blues[blues.length/2]);
+    }
+
+    private static int getColorRGB(int red, int green, int blue) {
+        red = (red << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
+        green = (green << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
+        blue = blue & 0x000000FF; //Mask out anything not blue.
+
+        return 0xFF000000 | red | green | blue;
     }
 }
