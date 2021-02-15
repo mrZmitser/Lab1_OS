@@ -1,41 +1,97 @@
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class MedianFilterParallel {
-    private static class FilterThread extends Thread{
+    private static class FilterThread extends Thread {
         private final BufferedImage srcImg;
+        private final int radius;
         private final int startPos, finishPos;
-        private int[] filteredRgbs;
+        private final int[] filteredRGBs;
 
-        FilterThread(BufferedImage srcImg, int startPos, int finishPos){
+        public int[] getFilteredRGBs() {
+            return filteredRGBs;
+        }
+
+        public FilterThread(BufferedImage srcImg, int startPos, int finishPos, int radius) {
             this.srcImg = srcImg;
             this.startPos = startPos;
             this.finishPos = finishPos;
+            filteredRGBs = new int[finishPos - startPos];
+            this.radius = radius;
         }
 
         @Override
         public void run() {
+            for (int k = startPos; k < finishPos; k++) {
+                int j = k / srcImg.getWidth();
+                int i = k % srcImg.getWidth();
+                filteredRGBs[k - startPos] = getMedian(srcImg, i, j, radius);
+            }
         }
     }
 
-    BufferedImage filterImage(BufferedImage srcImg, int size) {
+    public static BufferedImage filterImage(BufferedImage srcImg, int radius) {
         BufferedImage newImg = new BufferedImage(srcImg.getWidth(), srcImg.getHeight(), TYPE_INT_ARGB);
         for (int i = 0; i < srcImg.getWidth(); ++i) {
             for (int j = 0; j < srcImg.getHeight(); ++j) {
-                newImg.setRGB(i, j, getMedian(srcImg, i, j, size));
+                newImg.setRGB(i, j, getMedian(srcImg, i, j, radius));
             }
         }
         return newImg;
     }
 
-    private int getMedian(BufferedImage srcImg, int x, int y, int size) {
-        int squareSide = 2 * size + 1;
+    public static BufferedImage filterImageParallel(BufferedImage srcImg, int radius, int threadCount)
+            throws InterruptedException {
+        assert (radius > 0);
+        assert (threadCount > 0);
+        FilterThread[] threads = new FilterThread[threadCount];
+        int square = srcImg.getHeight() * srcImg.getWidth();
+        int sliceSize = square/threadCount;
+        for (int i = 0; i < threadCount; i++) {
+            if (i < threadCount - 1) {
+                threads[i] = new FilterThread(srcImg, sliceSize * i, sliceSize * (i + 1), radius);
+            } else {
+                threads[i] = new FilterThread(srcImg, sliceSize * i, square, radius);
+            }
+        }
+        for (var thread: threads) {
+            thread.start();
+        }
+        for (var thread: threads) {
+            thread.join();
+        }
+        var filteredRGBs = new ArrayList<Integer>();
+        for (var thread: threads) {
+            for(var rgb: thread.getFilteredRGBs())
+                filteredRGBs.add(rgb);
+        }
+        return createImageFromPixels(filteredRGBs, srcImg.getWidth(), srcImg.getHeight(), BufferedImage.TYPE_INT_RGB);
+    }
+
+    private static BufferedImage createImageFromPixels(ArrayList<Integer> filteredRGBs, int width, int height,
+                                                       int imageType) {
+        assert (width > 0);
+        assert (height > 0);
+        var img = new BufferedImage(width, height, imageType);
+        int k = 0;
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
+                img.setRGB(i, j, filteredRGBs.get(k++));
+            }
+        }
+        return img;
+    }
+
+    private static int getMedian(BufferedImage srcImg, int x, int y, int radius) {
+        int squareSide = 2 * radius + 1;
         int[] square = new int[squareSide * squareSide];
         int k = 0;
-        for (int i = -size; i <= size; ++i) {
-            for (int j = -size; j <= size; ++j) {
+        for (int i = -radius; i <= radius; ++i) {
+            for (int j = -radius; j <= radius; ++j) {
                 try {
                     square[k++] = srcImg.getRGB(x + i, y + j);
                 } catch (IndexOutOfBoundsException e) {
