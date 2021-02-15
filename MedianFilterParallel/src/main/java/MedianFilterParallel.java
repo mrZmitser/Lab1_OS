@@ -2,6 +2,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.regex.Pattern;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
@@ -27,8 +28,8 @@ public class MedianFilterParallel {
         @Override
         public void run() {
             for (int k = startPos; k < finishPos; k++) {
-                int j = k / srcImg.getWidth();
-                int i = k % srcImg.getWidth();
+                int i = k / srcImg.getHeight();
+                int j = k % srcImg.getHeight();
                 filteredRGBs[k - startPos] = getMedian(srcImg, i, j, radius);
             }
         }

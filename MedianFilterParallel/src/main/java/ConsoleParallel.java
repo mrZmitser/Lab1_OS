@@ -22,7 +22,8 @@ public class ConsoleParallel {
         }
         File newImgFile = new File("img.png");
         try {
-            ImageIO.write(MedianFilterParallel.filterImageParallel(img, radius, threadCount), "png", newImgFile);
+            ImageIO.write(MedianFilterParallel.filterImageParallel(img, radius, threadCount),
+                    "png", newImgFile);
         } catch (IOException e) {
             System.err.println("Unable to create file");
             System.exit(-1);
