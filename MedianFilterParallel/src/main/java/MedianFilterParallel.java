@@ -1,11 +1,27 @@
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-public class MedianFilterParallel {
-    BufferedImage filterImage(BufferedImage srcImg, int size) {
-        BufferedImage newImg = new BufferedImage(srcImg.getWidth(), srcImg.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
+public class MedianFilterParallel {
+    private static class FilterThread extends Thread{
+        private final BufferedImage srcImg;
+        private final int startPos, finishPos;
+        private int[] filteredRgbs;
+
+        FilterThread(BufferedImage srcImg, int startPos, int finishPos){
+            this.srcImg = srcImg;
+            this.startPos = startPos;
+            this.finishPos = finishPos;
+        }
+
+        @Override
+        public void run() {
+        }
+    }
+
+    BufferedImage filterImage(BufferedImage srcImg, int size) {
+        BufferedImage newImg = new BufferedImage(srcImg.getWidth(), srcImg.getHeight(), TYPE_INT_ARGB);
         for (int i = 0; i < srcImg.getWidth(); ++i) {
             for (int j = 0; j < srcImg.getHeight(); ++j) {
                 newImg.setRGB(i, j, getMedian(srcImg, i, j, size));
