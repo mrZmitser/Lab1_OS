@@ -40,6 +40,7 @@ public class MedianFilterParallel {
 
     public static BufferedImage filterImageParallel(BufferedImage srcImg, int radius, int threadCount)
             throws InterruptedException {
+        assert (srcImg != null);
         assert (radius > 0);
         assert (threadCount > 0);
 
@@ -55,11 +56,13 @@ public class MedianFilterParallel {
         for (var thread : threads) {
             thread.start();
         }
+
         for (var thread : threads) {
             thread.join();
         }
 
         var filtered = new int[pixelCount];
+
         for (FilterThread thread : threads) {
             System.arraycopy(thread.getFiltered(), 0, filtered, thread.getStart(), thread.getFiltered().length);
         }
@@ -110,6 +113,9 @@ public class MedianFilterParallel {
 
     public static BufferedImage filterImageStream(BufferedImage srcImg, int radius, int threadCount)
             throws ExecutionException, InterruptedException {
+        assert (srcImg != null);
+        assert (radius > 0);
+        assert (threadCount > 0);
 
         int pixelCount = srcImg.getHeight() * srcImg.getWidth();
         ForkJoinPool filterPool = new ForkJoinPool(threadCount);
