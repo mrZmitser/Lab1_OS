@@ -101,7 +101,6 @@ public class MedianFilterParallel {
     }
 
     private static int getColorRGB(int red, int green, int blue, int alpha) {
-        System.out.println(alpha);
         alpha = (alpha << 24) & 0xFF000000; //Shift alpha 24-bits
         red = (red << 16) & 0x00FF0000;     //Shift red 16-bits and mask out other stuff
         green = (green << 8) & 0x0000FF00;  //Shift Green 8-bits and mask out other stuff
