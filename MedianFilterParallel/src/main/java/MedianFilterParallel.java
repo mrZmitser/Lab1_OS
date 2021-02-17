@@ -107,18 +107,17 @@ public class MedianFilterParallel {
         assert (radius > 0);
         assert (threadCount > 0);
 
+
         int pixelCount = srcImg.getHeight() * srcImg.getWidth();
         ForkJoinPool filterPool = new ForkJoinPool(threadCount);
-        int[] filtered =
-                filterPool
-                        .submit(
-                                () ->
-                                        IntStream
-                                                .range(0, pixelCount).parallel()
-                                                .map(k -> getMedian(srcImg, k % srcImg.getWidth(),
-                                                        k / srcImg.getWidth(), radius)))
-                        .get()
-                        .toArray();
+
+        int[] filtered = filterPool
+                .submit(() ->
+                    IntStream
+                        .range(0, pixelCount).parallel().map(k -> getMedian(srcImg, k % srcImg.getWidth(),
+                        k / srcImg.getWidth(), radius)))
+                .get()
+                .toArray();
 
         return createImageFromPixels(filtered, srcImg.getWidth(), srcImg.getHeight(), srcImg.getType());
     }

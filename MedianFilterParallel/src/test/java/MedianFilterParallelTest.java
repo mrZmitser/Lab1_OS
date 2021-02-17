@@ -63,6 +63,7 @@ class MedianFilterParallelTest {
     }
 
     int bigWidth = 1000, bigHeight = 1000;
+
     @org.junit.jupiter.api.Test
     void filterLargeImageParallel1() { // 1 поток
         filterLargeImageParallelNoCheck(1000, 1000, 1);
