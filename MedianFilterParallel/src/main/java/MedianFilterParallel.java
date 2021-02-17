@@ -114,7 +114,8 @@ public class MedianFilterParallel {
         int[] filtered = filterPool
                 .submit(() ->
                     IntStream
-                        .range(0, pixelCount).parallel().map(k -> getMedian(srcImg, k % srcImg.getWidth(),
+                        .range(0, pixelCount).parallel()
+                        .map(k -> getMedian(srcImg, k % srcImg.getWidth(),
                         k / srcImg.getWidth(), radius)))
                 .get()
                 .toArray();
