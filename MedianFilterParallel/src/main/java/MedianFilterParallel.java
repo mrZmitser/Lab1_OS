@@ -77,38 +77,28 @@ public class MedianFilterParallel {
     }
 
     private static int getMedian(BufferedImage srcImg, int x, int y, int radius) {
-        var reds = new ArrayList<Integer>();
-        var greens = new ArrayList<Integer>();
-        var blues = new ArrayList<Integer>();
-        var alphas = new ArrayList<Integer>();
+        var hues = new ArrayList<Float>();
+        var saturations = new ArrayList<Float>();
+        var brightnesses = new ArrayList<Float>();
 
         for (int i = -radius; i <= radius; ++i) {
             for (int j = -radius; j <= radius; ++j) {
-                try {
-                    var rgb = new Color(srcImg.getRGB(x + i, y + j), true);
-                    reds.add(rgb.getRed());
-                    greens.add(rgb.getGreen());
-                    blues.add(rgb.getBlue());
-                    alphas.add(rgb.getAlpha());
-                } catch (IndexOutOfBoundsException ignored) {
+                if (x + i >= 0 && x + i < srcImg.getWidth() && y + j >= 0 && y + j < srcImg.getHeight()) {
+                    var rgb = new Color(srcImg.getRGB(x + i, y + j));
+                    var hsb = Color.RGBtoHSB(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), null);
+                    hues.add(hsb[0]);
+                    saturations.add(hsb[1]);
+                    brightnesses.add(hsb[2]);
                 }
             }
         }
 
-        reds.sort(Integer::compare);
-        greens.sort(Integer::compare);
-        blues.sort(Integer::compare);
-        alphas.sort(Integer::compare);
-        int mid = reds.size() / 2;
-        return getColorRGB(reds.get(mid), greens.get(mid), blues.get(mid), alphas.get(mid));
-    }
+        hues.sort(Float::compare);
+        saturations.sort(Float::compare);
+        brightnesses.sort(Float::compare);
 
-    private static int getColorRGB(int red, int green, int blue, int alpha) {
-        alpha = (alpha << 24) & 0xFF000000; //Shift alpha 24-bits
-        red = (red << 16) & 0x00FF0000;     //Shift red 16-bits and mask out other stuff
-        green = (green << 8) & 0x0000FF00;  //Shift Green 8-bits and mask out other stuff
-        blue = blue & 0x000000FF;           //Mask out anything not blue.
-        return alpha | red | green | blue;
+        int mid = hues.size() / 2;
+        return Color.HSBtoRGB(hues.get(mid), saturations.get(mid), brightnesses.get(mid));
     }
 
     public static BufferedImage filterImageStream(BufferedImage srcImg, int radius, int threadCount)
@@ -120,9 +110,15 @@ public class MedianFilterParallel {
         int pixelCount = srcImg.getHeight() * srcImg.getWidth();
         ForkJoinPool filterPool = new ForkJoinPool(threadCount);
         int[] filtered =
-                filterPool.submit(() -> IntStream.range(0, pixelCount).parallel()
-                        .map(k -> getMedian(srcImg, k % srcImg.getWidth(), k / srcImg.getWidth(), radius)))
-                        .get().toArray();
+                filterPool
+                        .submit(
+                                () ->
+                                        IntStream
+                                                .range(0, pixelCount).parallel()
+                                                .map(k -> getMedian(srcImg, k % srcImg.getWidth(),
+                                                        k / srcImg.getWidth(), radius)))
+                        .get()
+                        .toArray();
 
         return createImageFromPixels(filtered, srcImg.getWidth(), srcImg.getHeight(), srcImg.getType());
     }
