@@ -19,7 +19,7 @@ class MedianFilterParallelTest {
         img.setRGB(0, 0, 3, 3, pixels, 0, 3);
         BufferedImage newImg;
         try {
-            newImg = MedianFilterParallel.filterImageParallel(img, 1, 200);
+            newImg = MedianFilterParallel.filterImageParallel(img, 1, 4);
         } catch (InterruptedException e) {
             e.printStackTrace();
             return;
@@ -39,7 +39,7 @@ class MedianFilterParallelTest {
         img.setRGB(0, 0, 3, 3, pixels, 0, 3);
         BufferedImage newImg;
         try {
-            newImg = MedianFilterParallel.filterImageStream(img, 1, 200);
+            newImg = MedianFilterParallel.filterImageStream(img, 1, 4);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return;
