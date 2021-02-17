@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MedianFilterParallelTest {
     BufferedImage img;
     int[] pixels = {9, 1, 8, 2, 7, 3, 6, 4, 5};
-    int[] et = {7, 7, 7, 6, 5, 5, 6, 5, 5};
+    int[] rightResult = {7, 7, 7, 6, 5, 5, 6, 5, 5};
 
     @org.junit.jupiter.api.Test
     void filterSmallImageParallel() {
@@ -29,7 +29,7 @@ class MedianFilterParallelTest {
                 newPixels[i * newImg.getWidth() + j] = newImg.getRGB(j, i);
             }
         }
-        assertArrayEquals(et, newPixels);
+        assertArrayEquals(rightResult, newPixels);
     }
 
     @org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ class MedianFilterParallelTest {
                 newPixels[i * newImg.getWidth() + j] = newImg.getRGB(j, i);
             }
         }
-        assertArrayEquals(et, newPixels);
+        assertArrayEquals(rightResult, newPixels);
     }
 
     void filterLargeImageParallelNoCheck(int width, int height, int threadsCount){
