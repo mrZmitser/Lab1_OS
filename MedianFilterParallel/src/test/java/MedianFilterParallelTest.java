@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class MedianFilterParallelTest {
     BufferedImage img;
     int[] pixels = {9, 1, 8, 2, 7, 3, 6, 4, 5};
-    int[] rightResult = {7, 7, 7, 6, 5, 5, 6, 5, 5};
+    int[] rightResult = {-16777209, -16777209, -16777209, -16777210,
+            -16777211, -16777211, -16777210, -16777211, -16777211};
 
     @org.junit.jupiter.api.Test
     void filterSmallImageParallel() {
@@ -61,6 +62,7 @@ class MedianFilterParallelTest {
         }
     }
 
+    int bigWidth = 1000, bigHeight = 1000;
     @org.junit.jupiter.api.Test
     void filterLargeImageParallel1() { // 1 поток
         filterLargeImageParallelNoCheck(1000, 1000, 1);
@@ -133,10 +135,10 @@ class MedianFilterParallelTest {
 
     @org.junit.jupiter.api.Test
     void filterImageByPath() {
-        int radius = 5;
+        int radius = 10;
         int threadCount = 4;
 
-        String path = "src\\test\\test_img.png";
+        String path = "d:\\dimag\\Study\\LabsOS\\LabTestParallel\\big.png";
         File imgFile = new File(path);
         BufferedImage img;
         try {
