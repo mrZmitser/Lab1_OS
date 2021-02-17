@@ -1,3 +1,5 @@
+import org.junit.jupiter.api.Test;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,11 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MedianFilterParallelTest {
     BufferedImage img;
+    int imgWidth = 10000;
+    int imgHeight = 10000;
     int[] pixels = {9, 1, 8, 2, 7, 3, 6, 4, 5};
-    int[] rightResult = {7, 7, 7, 6, 5, 5, 6, 5, 5};
+    int[] rightResult = {-16777209, -16777209, -16777209, -16777210, -16777211, -16777211, -16777210,
+            -16777211, -16777211};
 
-    @org.junit.jupiter.api.Test
-    void filterSmallImageParallel() {
+    @Test
+    void imgParallel() {
         int[] newPixels = new int[9];
         img = new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB);
         img.setRGB(0, 0, 3, 3, pixels, 0, 3);
@@ -32,8 +37,8 @@ class MedianFilterParallelTest {
         assertArrayEquals(rightResult, newPixels);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterSmallImageStream() {
+    @Test
+    void imgStream() {
         int[] newPixels = new int[9];
         img = new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB);
         img.setRGB(0, 0, 3, 3, pixels, 0, 3);
@@ -52,7 +57,7 @@ class MedianFilterParallelTest {
         assertArrayEquals(rightResult, newPixels);
     }
 
-    void filterLargeImageParallelNoCheck(int width, int height, int threadsCount) {
+    void bigImgParallel(int width, int height, int threadsCount) {
         img = getRandomImage(width, height);
         try {
             MedianFilterParallel.filterImageParallel(img, 5, threadsCount);
@@ -61,32 +66,32 @@ class MedianFilterParallelTest {
         }
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageParallel1() { // 1 поток
-        filterLargeImageParallelNoCheck(1000, 1000, 1);
+    @Test
+    void bigImgParallel1() { // 1 поток
+        bigImgParallel(imgWidth, imgHeight, 1);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageParallel2() { // 2 потока
-        filterLargeImageParallelNoCheck(1000, 1000, 2);
+    @Test
+    void bigImgParallel2() { // 2 потока
+        bigImgParallel(imgWidth, imgHeight, 2);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageParallel4() { // 4 потока
-        filterLargeImageParallelNoCheck(1000, 1000, 4);
+    @Test
+    void bigImgParallel4() { // 4 потока
+        bigImgParallel(imgWidth, imgHeight, 4);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageParallel8() { // 8 потоков
-        filterLargeImageParallelNoCheck(1000, 1000, 8);
+    @Test
+    void bigImgParallel8() { // 8 потоков
+        bigImgParallel(imgWidth, imgHeight, 8);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageParallel16() { // 16 потоков
-        filterLargeImageParallelNoCheck(1000, 1000, 16);
+    @Test
+    void bigImgParallel16() { // 16 потоков
+        bigImgParallel(imgWidth, imgHeight, 16);
     }
 
-    void filterLargeImageStreamNoCheck(int width, int height, int threadsCount) {
+    void bigImgStream(int width, int height, int threadsCount) {
         img = getRandomImage(width, height);
         try {
             MedianFilterParallel.filterImageStream(img, 5, threadsCount);
@@ -95,29 +100,29 @@ class MedianFilterParallelTest {
         }
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageStream1() { // 1 поток
-        filterLargeImageStreamNoCheck(1000, 1000, 1);
+    @Test
+    void bigImgStream1() { // 1 поток
+        bigImgStream(imgWidth, imgHeight, 1);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageStream2() { // 2 потока
-        filterLargeImageStreamNoCheck(1000, 1000, 2);
+    @Test
+    void bigImgStream2() { // 2 потока
+        bigImgStream(imgWidth, imgHeight, 2);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageStream4() { // 4 потока
-        filterLargeImageStreamNoCheck(1000, 1000, 4);
+    @Test
+    void bigImgStream4() { // 4 потока
+        bigImgStream(imgWidth, imgHeight, 4);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageStream8() { // 8 потоков
-        filterLargeImageStreamNoCheck(1000, 1000, 8);
+    @Test
+    void bigImgStream8() { // 8 потоков
+        bigImgStream(imgWidth, imgHeight, 8);
     }
 
-    @org.junit.jupiter.api.Test
-    void filterLargeImageStream16() { // 16 потоков
-        filterLargeImageStreamNoCheck(1000, 1000, 16);
+    @Test
+    void bigImgStream16() { // 16 потоков
+        bigImgStream(imgWidth, imgHeight, 16);
     }
 
     private BufferedImage getRandomImage(int width, int height) {
@@ -131,7 +136,7 @@ class MedianFilterParallelTest {
         return img;
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void filterImageByPath() {
         int radius = 5;
         int threadCount = 4;
