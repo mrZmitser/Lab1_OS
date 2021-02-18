@@ -141,7 +141,7 @@ class MedianFilterParallelTest {
         int radius = 5;
         int threadCount = 4;
 
-        String path = "src\\test\\test_img.png";
+        String path = "src\\main\\resources\\test_img.png";
         File imgFile = new File(path);
         BufferedImage img;
         try {
@@ -150,7 +150,7 @@ class MedianFilterParallelTest {
             e.printStackTrace();
             return;
         }
-        File newImgFile = new File("src\\test\\filtered_img.png");
+        File newImgFile = new File("src\\main\\resources\\filtered_img.png");
         try {
             ImageIO.write(MedianFilterParallel.filterImageStream(img, radius, threadCount),
                     "png", newImgFile);
