@@ -2,10 +2,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.Random;
+import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
